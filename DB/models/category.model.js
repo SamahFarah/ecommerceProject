@@ -12,6 +12,8 @@ const categorySchema = new Schema({
     },
     image: {
         type: String,
+        required: true,
+
     },
     status: {
         type: String,

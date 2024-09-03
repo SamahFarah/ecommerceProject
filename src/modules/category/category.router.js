@@ -1,0 +1,16 @@
+import { Router } from "express";
+const router=Router();
+import * as categoryController from './category.controller.js';
+import validation from "../../Middleware/validation.js";
+import { createCategorySchema, deleteCategorySchema, getCategoryByIdSchema, updateCategoryImageSchema, updateCategorySchema } from "./category.validation.js";
+import { auth } from "../../Middleware/auth.js";
+import { asyncHandler } from "../../Utils/catchError.js";
+import fileUpload from "../../Utils/multer.js";
+const upload = fileUpload().single('image');
+router.post('/',auth,upload,validation(createCategorySchema),asyncHandler(categoryController.createCategory));
+router.get('/',asyncHandler(categoryController.getCatergories));
+router.get('/:id',validation(getCategoryByIdSchema),asyncHandler(categoryController.getCategoryById));
+router.put('/:id',auth,validation(updateCategorySchema),asyncHandler(categoryController.updateCategoryDetails ));
+router.put('/image/:id',auth,upload,validation(updateCategoryImageSchema),asyncHandler(categoryController.updateCategoryImage ));
+router.delete('/:id',auth,validation(deleteCategorySchema),asyncHandler(categoryController.deleteCategory));
+export default router;
