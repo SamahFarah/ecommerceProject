@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { AppError } from "../../../AppError.js";
 import cloudinary from "../../Utils/cloudinary.js";
-
+import { sendEmail } from "../../Utils/sendEmail.js";
 export const Register = async (req, res, next) => {
     const { username, email, password,role } = req.body;
     const user = await userModel.findOne({ email });
@@ -13,6 +13,15 @@ export const Register = async (req, res, next) => {
     }
   
     const passwordHashed = await bcrypt.hash(password, parseInt(process.env.SALTROUND));
+    const html = `
+    <div>
+        <p style="color: #555; font-size: 16px;"> Dear: ${username} </p>
+        <h1 style="color: #4A90E2; font-size: 32px;">Welcome to ecommerce!</h1>
+        <p style="color: #555; font-size: 16px;">Thank you for registering with us.</p>
+    </div>
+`
+
+       sendEmail(email,"Welcom! ✔ ",html)
   
     let image = '';    //default value.
     
