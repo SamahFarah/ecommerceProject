@@ -5,7 +5,7 @@ function fileUpload(){
        
 
     function fileFilter(req,file,cb){
-             if(['image/png','image/jpeg','image/gif'].includes(file.mimetype)){
+             if(['image/png','image/jpeg','image/gif','image/JFIF'].includes(file.mimetype)){
                 cb(null,true)
              }
              else{

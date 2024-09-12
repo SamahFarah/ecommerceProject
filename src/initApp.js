@@ -1,6 +1,7 @@
 import connectDB from "../DB/connection.js";
 import authRouter from "./modules/auth/auth.router.js";
 import categoryRouter from "./modules/category/category.router.js"
+import productRouter from "./modules/product/product.router.js";
 //import SubcategoryRouter from "./modules/Subcategory/Subcategory.router.js"
 const initApp = (app,express)=>{
     connectDB();
@@ -8,6 +9,7 @@ const initApp = (app,express)=>{
     app.use('/auth',authRouter);
     app.use('/category',categoryRouter);
     //app.use('/Subcategory',SubcategoryRouter);
+    app.use('/product',productRouter)
 
 
     app.use('*',(req,res,next)=>{

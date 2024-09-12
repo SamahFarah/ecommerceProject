@@ -20,8 +20,8 @@ const productSchema = new Schema({
         required: true
     },
     mainImage: {
-        secure_url: { type: String, required: true },
-        public_id: { type: String, required: true }
+        type: Object,
+        required: true,
     },
     subImages: [{               
         secure_url: { type: String, required: false },
@@ -57,7 +57,7 @@ const productSchema = new Schema({
     },
     colors: [String], 
     sizes: {
-        type: String,
+        type: [String],
         enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], 
         required: true
     },
