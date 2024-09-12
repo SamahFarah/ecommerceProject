@@ -17,9 +17,12 @@ const initApp = (app,express)=>{
         return next(new Error(`page not found`));
     });
 
-    app.use( (err,req,res,next)=>{
-          return res.status(err.statusCode).json({message:err.message});
+    app.use((err, req, res, next) => {
+     
+        const statusCode = err.statusCode || 500;
+        return res.status(statusCode).json({ message: err.message || 'Internal Server Error' });
     });
+    
     
 }
 export default initApp;

@@ -61,3 +61,74 @@ export const createProduct = async (req, res, next) => {
 
 
 
+export const getProducts = async (req, res, next) => {
+    const { categoryId, subcategoryId } = req.params;
+
+    
+    const subcategories = await subcategoryModel.findOne({
+        _id: subcategoryId,
+        categoryId: categoryId
+    });
+
+    if (!subcategories) {
+        return next(new AppError('Subcategory does not belong to the given category', 404));
+    }
+
+   
+    const products = await productModel.find({ subcategory: subcategoryId });
+
+    
+    return res.status(200).json({
+        message: "success",
+        products
+    });
+};
+
+
+
+export const getProductById = async (req, res, next) => {
+    const { productId } = req.params;
+
+   
+      
+        const product = await productModel.findById(productId);
+
+       
+        if (!product) {
+            return next(new AppError('Product not found', 404));
+        }
+
+        
+        return res.status(200).json({
+            message: "success",
+            product
+        });
+
+    
+};
+
+
+export const deleteProductById = async (req, res, next) => {
+    const { productId } = req.params;
+
+        const product = await productModel.findById(productId);
+
+        if (!product) {
+            return next(new AppError('Product not found', 404));
+        }
+
+        
+        if (product.mainImage && product.mainImage.public_id) {
+            await cloudinary.uploader.destroy(product.mainImage.public_id);
+        }
+
+        
+        await productModel.findByIdAndDelete(productId);
+
+        
+        return res.status(200).json({
+            message: "success"
+        });
+   
+};
+
