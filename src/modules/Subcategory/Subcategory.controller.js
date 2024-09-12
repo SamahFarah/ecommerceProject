@@ -47,172 +47,193 @@ export const createSubcategory = async (req, res, next) => {
 
 
 export const getSubcategories = async (req, res, next) => {
-    
-        const populatedSubcategory = await subcategoryModel.find({})
-            .populate([
-                {
-                    path: 'createdBy',
-                    select: 'username'
-                },
-                {
-                    path: 'updatedBy',
-                    select: 'username'
-                },
-                {
-                    path: 'categoryId', 
-                    select: 'name'
-                }
-            ]);
+    const categoryId = req.params.categoryId; 
 
-        return res.status(200).json({ message: "success", subcategories: populatedSubcategory });
-    
+   
+    const populatedSubcategory = await subcategoryModel.find({categoryId})
+        .populate([
+            {
+                path: 'createdBy',
+                select: 'username'
+            },
+            {
+                path: 'updatedBy',
+                select: 'username'
+            },
+            {
+                path: 'categoryId', 
+                select: 'name'
+            }
+        ]);
+
+   
+    return res.status(200).json({ message: "success", subcategories: populatedSubcategory });
 };
+
 
 export const getSubcategoryById = async (req, res, next) => {
-  
-        const { id } = req.params;
-        const subcategory = await subcategoryModel.findById(id)
-            .populate([
-                {
-                    path: 'createdBy',
-                    select: 'username'
-                },
-                {
-                    path: 'updatedBy',
-                    select: 'username'
-                },
-                {
-                    path: 'categoryId',
-                    select: 'name'
-                }
-            ]);
+    const { categoryId, subcategoryId } = req.params; 
 
-        if (!subcategory) {
-            return next(new AppError('Subcategory not found', 404));
-        }
-
-        return res.status(200).json({ message: "success", subcategory });
     
+    const subcategory = await subcategoryModel.findOne({
+        _id: subcategoryId,
+        categoryId: categoryId
+    }).populate([
+        {
+            path: 'createdBy',
+            select: 'username'
+        },
+        {
+            path: 'updatedBy',
+            select: 'username'
+        },
+        {
+            path: 'categoryId',
+            select: 'name'
+        }
+    ]);
+
+    if (!subcategory) {
+        return next(new AppError('Subcategory not found or does not belong to the specified category', 404));
+    }
+
+    return res.status(200).json({ message: "success", subcategory });
 };
+
 
 
 export const updateSubcategoryDetails = async (req, res, next) => {
+    const userId = req.id; 
+    const { categoryId, subcategoryId } = req.params; 
+    const { name, status, newCategoryId } = req.body; 
+
+  
+    const currentCategoryExists = await categoryModel.findById(categoryId);
+    if (!currentCategoryExists) {
+        return next(new AppError('Current Category not found', 404));
+    }
+
    
-        const userId = req.id; 
-        const { id } = req.params; 
-        const { name, status, categoryId } = req.body; 
+    const subcategory = await subcategoryModel.findOne({ _id: subcategoryId, categoryId: categoryId });
+    if (!subcategory) {
+        return next(new AppError('Subcategory not found or does not belong to the specified category', 404));
+    }
 
-        const updateFields = {};
-        if (name) {
-            updateFields.name = name;
+    const updateFields = { updatedBy: userId };
+    if (name) {
+        updateFields.name = name;
+    }
+    if (status) {
+        updateFields.status = status;
+    }
+    if (newCategoryId) {
+       
+        const newCategoryExists = await categoryModel.findById(newCategoryId);
+        if (!newCategoryExists) {
+            return next(new AppError('New Category not found', 404));
         }
-        if (status) {
-            updateFields.status = status;
-        }
-        if (categoryId) {
-            
-            const categoryExists = await categoryModel.findById(categoryId);
-            if (!categoryExists) {
-                return next(new AppError('Category not found', 404));
-            }
-            updateFields.categoryId = categoryId;
-        }
+        updateFields.categoryId = newCategoryId;
+    }
 
-        if (Object.keys(updateFields).length > 0) {
-            updateFields.updatedBy = userId; 
-        }
-
-        const updatedSubcategory = await subcategoryModel.findByIdAndUpdate(id, updateFields, 
-            { new: true }).populate('updatedBy', 'username').populate('categoryId', 'name');
-
-        if (!updatedSubcategory) {
-            return next(new AppError('Subcategory not found', 404));
-        }
-
-        return res.status(200).json({
-            message: "success",
-            subcategory: {
-                name: updatedSubcategory.name,
-                status: updatedSubcategory.status,
-                category: updatedSubcategory.categoryId,
-                updatedBy: updatedSubcategory.updatedBy
-            }
-        });
     
+    const updatedSubcategory = await subcategoryModel.findByIdAndUpdate(subcategoryId, updateFields, 
+        { new: true }).populate('updatedBy', 'username').populate('categoryId', 'name');
+
+    if (!updatedSubcategory) {
+        return next(new AppError('Subcategory update failed', 404));
+    }
+
+    return res.status(200).json({
+        message: "success",
+        subcategory: {
+            name: updatedSubcategory.name,
+            status: updatedSubcategory.status,
+            category: updatedSubcategory.categoryId.name,
+            updatedBy: updatedSubcategory.updatedBy.username
+        }
+    });
 };
+
 
 
 export const updateSubcategoryImage = async (req, res, next) => {
+    const userId = req.id;
+    const { categoryId, subcategoryId } = req.params;  
+    if (!req.file) {
+        return next(new AppError('No image file provided', 400));
+    }
+
+    if (!req.file.path) {
+        return next(new AppError('File path is undefined', 400));
+    }
+
+    const category = await categoryModel.findById(categoryId);
+    if (!category) {
+        return next(new AppError('Category not found', 404));
+    }
+
+    const subcategory = await subcategoryModel.findOne({ _id: subcategoryId, categoryId: categoryId });
+    if (!subcategory) {
+        return next(new AppError('Subcategory not found or does not belong to the specified category', 404));
+    }
+
+    if (subcategory.image && subcategory.image.public_id) {
+        await cloudinary.uploader.destroy(subcategory.image.public_id);
+    }
+
+  
+    const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
+        folder: `${process.env.APPNAME}/category/subcategory`
+    });
+
     
-        const userId = req.id;
-        const { id } = req.params;
+    const updatedSubcategory = await subcategoryModel.findByIdAndUpdate(
+        subcategoryId,  
+        {
+            image: { secure_url, public_id },
+            updatedBy: userId
+        },
+        { new: true }
+    ).populate('updatedBy', 'username');
 
-        if (!req.file) {
-            return next(new AppError('No image file provided', 400));
+    if (!updatedSubcategory) {
+        return next(new AppError('Subcategory update failed', 404));
+    }
+
+    return res.status(200).json({
+        message: "success",
+        subcategory: {
+            image: updatedSubcategory.image,
+            updatedBy: updatedSubcategory.updatedBy
         }
-
-        if (!req.file.path) {
-            return next(new AppError('File path is undefined', 400));
-        }
-
-      
-        const subcategory = await subcategoryModel.findById(id);
-        if (!subcategory) {
-            return next(new AppError('Subcategory not found', 404));
-        }
-
-        
-        if (subcategory.image && subcategory.image.public_id) {
-            await cloudinary.uploader.destroy(subcategory.image.public_id);
-        }
-
-
-        const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, { folder: `${process.env.APPNAME}/category/subcategory` });
-
-
-       
-        const updatedSubcategory = await subcategoryModel.findByIdAndUpdate(
-            id,
-            {
-                image: { secure_url, public_id },
-                updatedBy: userId
-            },
-            { new: true }
-        ).populate('updatedBy', 'username');
-
-        if (!updatedSubcategory) {
-            return next(new AppError('Subcategory not found', 404));
-        }
-
-        return res.status(200).json({
-            message: "success",
-            subcategory: {
-                image: updatedSubcategory.image,
-                updatedBy: updatedSubcategory.updatedBy
-            }
-        });
-    
+    });
 };
+
 
 
 export const deleteSubcategory = async (req, res, next) => {
-  
-        const { id } = req.params;
-        const subcategory = await subcategoryModel.findByIdAndDelete(id);
+    const { categoryId, subcategoryId } = req.params; 
 
-        if (!subcategory) {
-            return next(new AppError('Subcategory not found', 404));
-        }
+    
+    const category = await categoryModel.findById(categoryId);
+    if (!category) {
+        return next(new AppError('Category not found', 404));
+    }
 
-        
-        if (subcategory.image && subcategory.image.public_id) {
-            await cloudinary.uploader.destroy(subcategory.image.public_id);
-        }
+    const subcategory = await subcategoryModel.findOneAndDelete({ _id: subcategoryId, categoryId: categoryId });
+    if (!subcategory) {
+        return next(new AppError('Subcategory not found or does not belong to the specified category', 404));
+    }
 
-        return res.status(200).json({
-            message: "success"
-        });
-   
+    
+    if (subcategory.image && subcategory.image.public_id) {
+        await cloudinary.uploader.destroy(subcategory.image.public_id);
+    }
+
+    return res.status(200).json({
+        message: "success"
+    });
 };
+
 
 

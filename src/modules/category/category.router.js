@@ -7,7 +7,11 @@ import { auth,roles } from "../../Middleware/auth.js";
 import { asyncHandler } from "../../Utils/catchError.js";
 import fileUpload from "../../Utils/multer.js";
 import { endPoints } from "./category.role.js";
+import SubcategoryRouter from "./../Subcategory/Subcategory.router.js";
+
 const upload = fileUpload().single('image');
+
+router.use('/:categoryId/Subcategory',SubcategoryRouter)
 router.post('/',auth(endPoints.create),upload,validation(createCategorySchema),asyncHandler(categoryController.createCategory));
 router.get('/',asyncHandler(categoryController.getCatergories));
 router.get('/:id',validation(getCategoryByIdSchema),asyncHandler(categoryController.getCategoryById));
