@@ -2,6 +2,7 @@ import userModel from "../../../DB/models/user.model.js";
 import { AppError } from "../../../AppError.js";
 import cloudinary from "../../Utils/cloudinary.js";
 import categoryModel from "../../../DB/models/category.model.js";
+import subcategoryModel from "../../../DB/models/subcategory.model.js";
 
 export const createCategory = async (req, res, next) => {
     
@@ -157,23 +158,32 @@ export const getCategoryById = async (req, res, next) => {
 
     
 
-export const deleteCategory = async (req, res, next) => {
- 
-        
-       
-
+    export const deleteCategory = async (req, res, next) => {
         const { id } = req.params; 
+    
+        
         const category = await categoryModel.findByIdAndDelete(id);
-
+    
         if (!category) {
-            return next(new AppError('Category not found', 404));
+            return next(new AppError('Category not found', 404)); 
         }
+    
+        
+        const subcategories = await subcategoryModel.find({ categoryId: id });
+        for (let subcategory of subcategories) {
+            await cloudinary.uploader.destroy(subcategory.image.public_id);  
+        }
+    
+        
+        await subcategoryModel.deleteMany({ categoryId: id });
+    
+        
         await cloudinary.uploader.destroy(category.image.public_id);
-
+    
+        
         return res.status(200).json({
             message: "success"
         });
+    };
     
-};
-
 
