@@ -5,6 +5,6 @@ import 'dotenv/config';
 
 const app = express()
 initApp(app,express);
+const port = process.env.PORT || 3000;
 
-
-app.listen(process.env.PORT, () => console.log(`project app listening on port ${process.env.PORT}!`))
+app.listen(port, () => console.log(`project app listening on port ${port}!`))

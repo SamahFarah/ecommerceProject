@@ -1,7 +1,7 @@
 import { AppError } from "../../../AppError.js";
 import cloudinary from "../../Utils/cloudinary.js";
 import categoryModel from "../../../DB/models/category.model.js";
-import subcategoryModel from "../../../DB/models/subcategory.model.js";
+import subcategoryModel from "../../../DB/models/Subcategory.model.js";
 import productModel from "../../../DB/models/product.model.js";
 
 

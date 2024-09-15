@@ -2,7 +2,7 @@ import userModel from "../../../DB/models/user.model.js";
 import { AppError } from "../../../AppError.js";
 import cloudinary from "../../Utils/cloudinary.js";
 import categoryModel from "../../../DB/models/category.model.js";
-import subcategoryModel from "../../../DB/models/subcategory.model.js";
+import subcategoryModel from "../../../DB/models/Subcategory.model.js";
 
 export const createCategory = async (req, res, next) => {
     
