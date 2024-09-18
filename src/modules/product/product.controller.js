@@ -50,7 +50,13 @@ if(req.files.subImages){
             })
     }
 }
-   
+
+let price= req.body.price
+
+let discount = req.body.discount || 0;  
+let priceAfterDiscount = price - (price * discount / 100);
+
+
     req.body.createdBy = req.id;
     req.body.updatedBy = req.id;
 
@@ -59,10 +65,12 @@ if(req.files.subImages){
         description: req.body.description,
         mainImage: { secure_url, public_id },
         subImages,
-        price: req.body.price,
+        price,
         stock: req.body.stock,
         category: req.body.category,
-        subcategory: req.body.subcategory
+        subcategory: req.body.subcategory,
+        priceAfterDiscount,
+        discount,
     });
 
     return res.status(201).json({ message: "Product created successfully", product });

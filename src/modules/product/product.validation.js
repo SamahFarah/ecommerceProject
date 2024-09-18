@@ -34,6 +34,7 @@ export const createProductSchema = {
     sizes: Joi.array().items(Joi.string()).optional().messages({
       'array.base': 'Sizes must be an array of strings',
     }),
+    discount:Joi.number().positive().integer().optional(),
   }),
 };
 
