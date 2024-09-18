@@ -3,13 +3,15 @@ import authRouter from "./modules/auth/auth.router.js";
 import categoryRouter from "./modules/category/category.router.js"
 import productRouter from "./modules/product/product.router.js";
 //import SubcategoryRouter from "./modules/Subcategory/Subcategory.router.js"
+import cartRouter from "./modules/cart/cart.router.js";
 const initApp = (app,express)=>{
     connectDB();
     app.use(express.json());
     app.use('/auth',authRouter);
     app.use('/category',categoryRouter);
     //app.use('/Subcategory',SubcategoryRouter);
-    app.use('/product',productRouter)
+    app.use('/product',productRouter);
+    app.use('/cart',cartRouter);
 
 
     app.use('*',(req,res,next)=>{

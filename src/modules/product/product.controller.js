@@ -73,7 +73,7 @@ let priceAfterDiscount = price - (price * discount / 100);
         discount,
     });
 
-    return res.status(201).json({ message: "Product created successfully", product });
+    return res.status(201).json({ message: "success", product });
 };
 
 
