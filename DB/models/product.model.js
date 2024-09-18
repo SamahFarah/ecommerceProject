@@ -13,7 +13,8 @@ const productSchema = new Schema({
     name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+
     },
     description: {
         type: String,
@@ -23,10 +24,10 @@ const productSchema = new Schema({
         type: Object,
         required: true,
     },
-    subImages: [{               
-        secure_url: { type: String, required: false },
-        public_id: { type: String, required: false }
-    }],
+    subImages: {
+        type: Object,
+        required: true,
+    },
     price: {
         type: Number,
         required: true
@@ -37,9 +38,7 @@ const productSchema = new Schema({
     },
     priceAfterDiscount: {
         type: Number,
-        default: function() {
-            return this.price - (this.price * this.discount / 100);
-        }
+        
     },
     stock: {
         type: Number,
@@ -55,11 +54,14 @@ const productSchema = new Schema({
         ref: 'Subcategory',
         required: true
     },
-    colors: [String], 
+    colors:{
+
+    type: [String],
+    },
     sizes: {
         type: [String],
         enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL'], 
-        required: true
+       
     },
     status: {
         type: String,

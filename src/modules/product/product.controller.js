@@ -8,18 +8,18 @@ import productModel from "../../../DB/models/product.model.js";
 export const createProduct = async (req, res, next) => {
 
 
-    
     const category = await categoryModel.findById(req.body.category);
     if (!category) {
         return next(new AppError('Category does not exist', 404));
     }
 
-    
+  
+
     const subcategory = await subcategoryModel.findOne({
         _id: req.body.subcategory,
         categoryId: req.body.category
     });
-
+    
     if (!subcategory) {
         return next(new AppError('Subcategory does not exist in this category', 404));
     }
@@ -33,13 +33,23 @@ export const createProduct = async (req, res, next) => {
     if (existingProduct) {
         return next(new AppError('Product with the same name already exists in this subcategory', 400));
     }
-  
-    const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
-        folder: `${process.env.APPNAME}/category/subcategory/products`
+
+    const { secure_url, public_id } = await cloudinary.uploader.upload(req.files.mainImage[0].path, {
+        folder: `${process.env.APPNAME}/products/${req.body.name}`
     });
+    
 
-    req.body.mainImage = { secure_url, public_id };
-
+let subImages= [];
+if(req.files.subImages){
+    for(const file of req.files.subImages){
+        const upload= await cloudinary.uploader.upload(file.path,{folder: `${process.env.APPNAME}/products/${req.body.name}/subImages`});
+            
+            subImages.push({
+                secure_url: upload.secure_url,
+                public_id: upload.public_id,
+            })
+    }
+}
    
     req.body.createdBy = req.id;
     req.body.updatedBy = req.id;
@@ -47,13 +57,12 @@ export const createProduct = async (req, res, next) => {
     const product = await productModel.create({
         name: req.body.name,
         description: req.body.description,
-        mainImage: req.body.mainImage,
+        mainImage: { secure_url, public_id },
+        subImages,
         price: req.body.price,
         stock: req.body.stock,
         category: req.body.category,
-        subcategory: req.body.subcategory,
-        colors: req.body.colors,
-        sizes: req.body.sizes
+        subcategory: req.body.subcategory
     });
 
     return res.status(201).json({ message: "Product created successfully", product });

@@ -28,10 +28,10 @@ export const createProductSchema = {
       'string.length': 'Subcategory ID must be a valid 24-character ID',
       'any.required': 'Subcategory is required',
     }),
-    colors: Joi.array().items(Joi.string()).messages({
+    colors: Joi.array().items(Joi.string()).optional().messages({
       'array.base': 'Colors must be an array of strings',
     }),
-    sizes: Joi.array().items(Joi.string()).messages({
+    sizes: Joi.array().items(Joi.string()).optional().messages({
       'array.base': 'Sizes must be an array of strings',
     }),
   }),
