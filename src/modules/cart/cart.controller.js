@@ -97,7 +97,7 @@ export const clearCart = async (req, res, next) => {
 };
 
 
-export const increaseQuantity = async (req, res, next) => {
+/*export const increaseQuantity = async (req, res, next) => {
     const userId = req.id; 
     const { quantity } = req.body; 
     const { productId } = req.params; 
@@ -138,10 +138,10 @@ export const increaseQuantity = async (req, res, next) => {
     );
 
     return res.status(200).json({ message: "success", updatedCart });
-};
+};*/
 
 
-export const decreaseQuantity = async (req, res, next) => {
+/*export const decreaseQuantity = async (req, res, next) => {
     const userId = req.id;
     const { quantity } = req.body;
     const { productId } = req.params;
@@ -187,7 +187,28 @@ export const decreaseQuantity = async (req, res, next) => {
     );
 
     return res.status(200).json({ message: "success", updatedCart });
-};
+};*/
+
+export const updateQuantity = async (req, res, next) =>{
+    const {quantity,operator}= req.body;
+    const inc = (operator=="+")?quantity:-quantity;
+   
+    const cart= await cartModel.findOneAndUpdate({userId:req.id,
+        "products.productId":req.params.productId
+    },
+    {
+        $inc:{
+            "products.$.quantity":inc
+        }
+    },
+    {
+        new:true
+    }
+
+)
+       return res.status(200).json({message:"success",cart})
+}
+
 
 export const getCart = async (req, res, next) => {
     const userId = req.id;

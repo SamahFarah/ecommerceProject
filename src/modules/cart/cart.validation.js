@@ -28,7 +28,7 @@ export const removeItemSchema = {
   })
 };
 
-export const increaseQuantitySchema = {
+/*export const increaseQuantitySchema = {
   params: Joi.object({
     productId: Joi.string().length(24).required().messages({
       'string.length': 'Product ID must be a valid 24-character (ObjectId)',
@@ -43,9 +43,9 @@ export const increaseQuantitySchema = {
   }),
   })
   
-};
+};*/
 
-export const decreaseQuantitySchema = {
+/*export const decreaseQuantitySchema = {
   params: Joi.object({
     productId: Joi.string().length(24).required().messages({
       'string.length': 'Product ID must be a valid 24-character (ObjectId)',
@@ -60,4 +60,25 @@ export const decreaseQuantitySchema = {
   }),
   })
   
+};*/
+
+export const updateQuantitySchema = {
+  params: Joi.object({
+    productId: Joi.string().length(24).required().messages({
+      'string.length': 'Product ID must be a valid 24-character (ObjectId)',
+      'string.empty': 'Product ID is required',
+      'any.required': 'Product ID is required',
+    }),
+  }),
+  body: Joi.object({
+    quantity: Joi.number().min(1).required().messages({
+      'number.base': 'Quantity must be a number',
+      'number.min': 'Quantity must be at least 1',
+      'any.required': 'Quantity is required',
+    }),
+    operator: Joi.string().valid('+', '-').required().messages({
+      'any.only': 'Operator must be either "+" or "-"',
+      'any.required': 'Operator is required',
+    }),
+  }),
 };
