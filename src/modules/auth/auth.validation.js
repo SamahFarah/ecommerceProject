@@ -1,5 +1,6 @@
 import joi from 'joi';
 import { generalFeilds } from '../../Middleware/validation.js';
+import Joi from 'joi';
 export const registerSchema = {
 body:joi.object({
     username: joi.string().min(3).max(10).required().messages({
@@ -9,6 +10,10 @@ body:joi.object({
     email:generalFeilds.email,
    
     password: generalFeilds.password,
+    cpassword: Joi.any().valid(Joi.ref('password')).required().messages({
+        'any.only': 'Confirm password must match password',
+        'any.required': 'Confirm password is required',
+      }),
     image:joi.string().optional(),
     phone:joi.string().optional(),
     address:joi.string().optional(),
@@ -35,3 +40,27 @@ export const loginSchema ={
 
 })
 };
+
+
+export const sendCodeSchema = {
+    body: Joi.object({
+      email: generalFeilds.email
+    }),
+  };
+
+
+
+  export const forgotPasswordSchema = {
+    body: Joi.object({
+      email: generalFeilds.email,
+      password: generalFeilds.password,
+      cpassword: Joi.any().valid(Joi.ref('password')).required().messages({
+        'any.only': 'Confirm password must match password',
+        'any.required': 'Confirm password is required',
+      }),
+      code: Joi.string().length(4).required().messages({
+        'string.empty': 'Code is required',
+        'string.length': 'Code must be 4 digits',
+      }),
+    }),
+  };

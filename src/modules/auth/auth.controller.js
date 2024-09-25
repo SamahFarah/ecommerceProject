@@ -4,6 +4,10 @@ import jwt from 'jsonwebtoken';
 import { AppError } from "../../../AppError.js";
 import cloudinary from "../../Utils/cloudinary.js";
 import { sendEmail } from "../../Utils/sendEmail.js";
+import { customAlphabet } from "nanoid";
+
+
+
 export const Register = async (req, res, next) => {
     const { username, email, password,role } = req.body;
     const user = await userModel.findOne({ email });
@@ -66,3 +70,40 @@ export const Login = async(req,res,next)=>{
 
 }
 
+export const sendCode = async(req,res,next)=>{
+const {email}= req.body;
+const code= customAlphabet('1234567890',4)();
+const user= await userModel.findOneAndUpdate({email},{
+  sendCode:code
+}
+,{
+  new:true
+});
+if (!user) {
+  return next(new AppError('email not found', 409));
+}
+const html = `<h2> code is : ${code} </h2>`
+await sendEmail(email,'reset password',html);
+return res.status(200).json({message:"success"})
+
+}
+
+export const forgotpassword = async(req,res,next)=>{
+  const {email,password,code}=req.body;
+
+  const user= await userModel.findOne({email});
+  if(!user){
+    return next(new AppError('email not found', 409));
+
+  }
+
+  if(user.sendCode != code){
+    return next(new AppError('invalid code', 409));
+
+  }
+  user.password= bcrypt.hashSync(password,parseInt(process.env.SALTROUND));
+  user.sendCode=null;
+  await user.save();
+  return res.status(200).json({message:"success"});
+
+}
