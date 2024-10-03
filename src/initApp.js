@@ -4,6 +4,8 @@ import categoryRouter from "./modules/category/category.router.js"
 import productRouter from "./modules/product/product.router.js";
 //import SubcategoryRouter from "./modules/Subcategory/Subcategory.router.js"
 import cartRouter from "./modules/cart/cart.router.js";
+import couponRouter from "./modules/coupon/coupon.router.js";
+
 const initApp = (app,express)=>{
     connectDB();
     app.use(express.json());
@@ -12,6 +14,8 @@ const initApp = (app,express)=>{
     //app.use('/Subcategory',SubcategoryRouter);
     app.use('/product',productRouter);
     app.use('/cart',cartRouter);
+    app.use('/coupon',couponRouter);
+
 
 
     app.use('*',(req,res,next)=>{
