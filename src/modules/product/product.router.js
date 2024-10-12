@@ -6,9 +6,10 @@ import { auth,roles } from "../../Middleware/auth.js";
 import { asyncHandler } from "../../Utils/catchError.js";
 import fileUpload from "../../Utils/multer.js";
 import { endPoints } from "./product.role.js";
+import reviewRouter from "./../review/review.router.js"
 import { createProductSchema, deletetProductSchema, getProductsByIdSchema, getProductsSchema} from "./product.validation.js";
 //const upload = fileUpload().single('image');
-
+router.use('/:productId/review',reviewRouter)
 
 router.post('/', auth(endPoints.create), fileUpload().fields([{name: 'mainImage',maxCount: 1},
     {name : 'subImages',maxCount: 5}]),

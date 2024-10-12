@@ -92,7 +92,8 @@ export const getProducts = async (req, res, next) => {
     }
 
    
-    const products = await productModel.find({ subcategory: subcategoryId });
+    const products = await productModel.find({ subcategory: subcategoryId })
+        .populate('reviews');
 
     
     return res.status(200).json({
