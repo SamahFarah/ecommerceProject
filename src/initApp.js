@@ -5,6 +5,7 @@ import productRouter from "./modules/product/product.router.js";
 //import SubcategoryRouter from "./modules/Subcategory/Subcategory.router.js"
 import cartRouter from "./modules/cart/cart.router.js";
 import couponRouter from "./modules/coupon/coupon.router.js";
+import orderRouter from "./modules/order/order.router.js";
 
 const initApp = (app,express)=>{
     connectDB();
@@ -15,6 +16,8 @@ const initApp = (app,express)=>{
     app.use('/product',productRouter);
     app.use('/cart',cartRouter);
     app.use('/coupon',couponRouter);
+    app.use('/order',orderRouter);
+
 
 
 
