@@ -41,13 +41,21 @@ status:{
 },
 role:{
     type:String,
-    enum:['user','admin'],
+    enum:['user','admin','delivery'],
     default:'user'
 },
 sendCode:{
     type:String,
     default:null
-}
+},
+rejectedOrdersCount: {
+    type: Number,
+    default: 0, // عدد مرات الرفض
+  },
+  isBlacklisted: {
+    type: Boolean,
+    default: false, // حالة البلاك ليست
+  },
 },{
     timestamps:true
 });

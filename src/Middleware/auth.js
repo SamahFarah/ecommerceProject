@@ -5,6 +5,7 @@ import userModel from '../../DB/models/user.model.js';
 export const roles={
     Admin: "admin",
     User:"user",
+    Delivery: "delivery",
 }
 
 export const auth= (accressRole= [])=>{
@@ -25,7 +26,7 @@ export const auth= (accressRole= [])=>{
            const user= await userModel.findById(decoded.id).select("username role");
             req.id=user._id;
            if(!accressRole.includes(user.role)){
-            return next(new AppError('You do not have Authentication on the  category ', 403));
+            return next(new AppError('You do not have Authentication', 403));
            }
             next();
         

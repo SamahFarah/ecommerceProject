@@ -102,3 +102,122 @@ await cartModel.updateOne({userId:req.id},
 
 return res.status(200).json({message:"success",order})
 };
+
+export const getPendingOrders = async (req, res, next) => {
+    try {
+      const pendingOrders = await orderModel.find({ status: 'pending' });
+      
+      if (pendingOrders.length === 0) {
+        return res.status(404).json({ message: 'No pending orders found' });
+      }
+  
+      return res.status(200).json({ message: 'Success', orders: pendingOrders });
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+  export const updateOrderStatus = async (req, res, next) => {
+    try {
+        const { newStatus } = req.body;
+        const { orderId } = req.params;
+      
+      const order = await orderModel.findById(orderId);
+  
+      if (!order) {
+        return next(new AppError('Order not found', 404));
+      }
+  
+      if (order.status === 'cancelled') {
+        return next(new AppError('Order is already cancelled', 400));
+      }
+      if (newStatus === 'cancelled') {
+       
+        for (const product of order.products) {
+          await productModel.findOneAndUpdate(
+            { _id: product.productId },
+            { $inc: { stock: product.quantity } }
+          );
+        }
+  
+        
+        if (order.couponId) {
+          await couponModel.updateOne(
+            { _id: order.couponId },
+            { $pull: { usedBy: order.userId } }
+          );
+        }
+      } else if (newStatus === 'confirmed') {
+        
+        order.status = newStatus;
+        await order.save();
+        return res.status(200).json({ message: 'success', order });
+      }
+  
+      order.status = newStatus;
+      await order.save();
+  
+      return res.status(200).json({ message: 'success', order });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  export const getConfirmedOrders = async (req, res, next) => {
+    try {
+      const confirmedOrders = await orderModel.find({ status: 'confirmed' });
+      return res.status(200).json({ message: 'Success', orders: confirmedOrders });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+
+  export const updateDeliveryStatus = async (req, res, next) => {
+    try {
+      const { orderId } = req.params;
+      const { newStatus } = req.body;
+  
+      const order = await orderModel.findById(orderId);
+      if (!order) {
+        return next(new AppError('Order not found', 404));
+      }
+  
+      
+      if (newStatus === 'onWay' || newStatus === 'delivered') {
+        order.status = newStatus;
+        await order.save();
+        return res.status(200).json({ message: "success", order });
+      }
+  
+      
+      if (newStatus === 'rejected') {
+        for (const product of order.products) {
+            await productModel.findOneAndUpdate(
+              { _id: product.productId },
+              { $inc: { stock: product.quantity } } 
+            );
+          }
+        
+        order.status = 'rejected';
+        await order.save();
+  
+   
+        const user = await userModel.findById(order.userId);
+        user.rejectedOrdersCount += 1;
+  
+       
+        if (user.rejectedOrdersCount >= 3) {
+          user.isBlacklisted = true;
+        }
+  
+        await user.save();
+        return res.status(200).json({ message: 'success', order });
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
+  
+  
+  
