@@ -17,15 +17,7 @@ export const Register = async (req, res, next) => {
     }
   
     const passwordHashed = await bcrypt.hash(password, parseInt(process.env.SALTROUND));
-    const html = `
-    <div>
-        <p style="color: #555; font-size: 16px;"> Dear: ${username} </p>
-        <h1 style="color: #4A90E2; font-size: 32px;">Welcome to ecommerce!</h1>
-        <p style="color: #555; font-size: 16px;">Thank you for registering with us.</p>
-    </div>
-`
-
-       sendEmail(email,"Welcom! ✔ ",html)
+   
   
     let image = '';    //default value.
     
@@ -40,12 +32,19 @@ export const Register = async (req, res, next) => {
     }
   
     
-    await userModel.create({ username, email, password: passwordHashed, image,role});
-  
-    return res.status(201).json({ message: "success" });
+   const creatUser= await userModel.create({ username, email, password: passwordHashed, image,role});
+    const token= jwt.sign({email},process.env.CONFIRMEMAILTOKEN);
+    await sendEmail(email,`confirm email from ecommerce website`,username,token)
+    return res.status(201).json({ message: "success",creatUser});
   };
   
-
+export const confirmEmail = async (req,res)=>{
+  const {token}=req.params;
+  const decoded= jwt.verify(token,process.env.CONFIRMEMAILTOKEN);
+  //console.log("Decoded token:", decoded);
+  await userModel.findOneAndUpdate({email:decoded.email},{confirmEmail:true});
+  return res.status(200).json({message:"success"});
+}
 
 export const Login = async(req,res,next)=>{
         
@@ -55,6 +54,10 @@ export const Login = async(req,res,next)=>{
     if(!user){
        // return res.status(404).json({message:"email not found"})
        return next(new AppError('email not found',404));
+    }
+    if(!user.confirmEmail){
+      return next(new AppError('please confirm your Email',409));
+
     }
     const match =  bcrypt.compareSync(password,user.password);
     if(!match){

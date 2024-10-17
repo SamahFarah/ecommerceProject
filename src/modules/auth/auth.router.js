@@ -12,5 +12,5 @@ router.post('/register',upload,validation(registerSchema), asyncHandler(authCont
 router.post('/login',validation(loginSchema),asyncHandler(authController.Login));
 router.put('/sendCode',validation(sendCodeSchema),asyncHandler(authController.sendCode));
 router.put('/forgotpassword',validation(forgotPasswordSchema),asyncHandler(authController.forgotpassword));
-
+router.get('/confirmEmail/:token',asyncHandler(authController.confirmEmail));
 export default router;
