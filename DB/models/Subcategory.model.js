@@ -13,6 +13,8 @@ const subcategorySchema = new Schema({
         type: String,
         required: true,
     },
+    slug: { type: String, required: true, unique: true },
+
     image: {
         type: Object,
         required: true,

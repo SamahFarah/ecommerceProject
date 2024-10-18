@@ -32,7 +32,7 @@ export const Register = async (req, res, next) => {
     }
   
     
-   const creatUser= await userModel.create({ username, email, password: passwordHashed, image,role});
+   const creatUser= await userModel.create({ username, email, password: passwordHashed,image,role});
     const token= jwt.sign({email},process.env.CONFIRMEMAILTOKEN);
     await sendEmail(email,`confirm email from ecommerce website`,username,token)
     return res.status(201).json({ message: "success",creatUser});
@@ -44,7 +44,7 @@ export const confirmEmail = async (req,res)=>{
   //console.log("Decoded token:", decoded);
   await userModel.findOneAndUpdate({email:decoded.email},{confirmEmail:true});
   return res.status(200).json({message:"success"});
-}
+};
 
 export const Login = async(req,res,next)=>{
         
@@ -71,7 +71,7 @@ export const Login = async(req,res,next)=>{
     );
     return res.status(200).json({message:"success",token})
 
-}
+};
 
 export const sendCode = async(req,res,next)=>{
 const {email}= req.body;
@@ -89,7 +89,7 @@ const html = `<h2> code is : ${code} </h2>`
 await sendEmail(email,'reset password',html);
 return res.status(200).json({message:"success"})
 
-}
+};
 
 export const forgotpassword = async(req,res,next)=>{
   const {email,password,code}=req.body;
@@ -109,4 +109,4 @@ export const forgotpassword = async(req,res,next)=>{
   await user.save();
   return res.status(200).json({message:"success"});
 
-}
+};

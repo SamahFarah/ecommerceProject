@@ -9,6 +9,7 @@ export const createSubCategorySchema = {
     status: Joi.string().valid('active', 'not_active').default('not_active').messages({
       'any.only': 'Status must be either active or not_active',
     }),
+    slug: Joi.string().optional(),
     
   }),
   params: Joi.object({
@@ -40,6 +41,7 @@ export const updateSubCategorySchema = {
       name: Joi.string().optional().messages({
           'string.empty': 'Subcategory name cannot be empty'
       }),
+      slug: Joi.string().optional(),
       status: Joi.string().valid('active', 'not_active').optional().messages({
           'any.only': 'Status must be either active or not_active'
       }),

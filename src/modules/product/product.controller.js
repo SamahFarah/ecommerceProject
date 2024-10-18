@@ -3,6 +3,7 @@ import cloudinary from "../../Utils/cloudinary.js";
 import categoryModel from "../../../DB/models/category.model.js";
 import subcategoryModel from "../../../DB/models/Subcategory.model.js";
 import productModel from "../../../DB/models/product.model.js";
+import slugify from "slugify";
 
 
 export const createProduct = async (req, res, next) => {
@@ -59,9 +60,12 @@ let priceAfterDiscount = price - (price * discount / 100);
 
     req.body.createdBy = req.id;
     req.body.updatedBy = req.id;
+    req.body.slug = slugify(req.body.name, { lower: true });
+
 
     const product = await productModel.create({
         name: req.body.name,
+        slug: req.body.slug, 
         description: req.body.description,
         mainImage: { secure_url, public_id },
         subImages,

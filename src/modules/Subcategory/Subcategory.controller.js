@@ -3,6 +3,7 @@ import { AppError } from "../../../AppError.js";
 import cloudinary from "../../Utils/cloudinary.js";
 import categoryModel from "../../../DB/models/category.model.js";
 import subcategoryModel from "../../../DB/models/Subcategory.model.js";
+import slugify from "slugify";
 
 export const createSubcategory = async (req, res, next) => {
  
@@ -35,6 +36,8 @@ export const createSubcategory = async (req, res, next) => {
     req.body.updatedBy = req.id;
 
     req.body.categoryId = req.params.categoryId;
+    req.body.slug = slugify(req.body.name, { lower: true });
+
 
     const subcategory = await subcategoryModel.create(req.body);
 
@@ -122,6 +125,8 @@ export const updateSubcategoryDetails = async (req, res, next) => {
     const updateFields = { updatedBy: userId };
     if (name) {
         updateFields.name = name;
+        updateFields.slug = slugify(name, { lower: true }); 
+
     }
     if (status) {
         updateFields.status = status;
@@ -147,6 +152,7 @@ export const updateSubcategoryDetails = async (req, res, next) => {
         message: "success",
         subcategory: {
             name: updatedSubcategory.name,
+            slug: updatedSubcategory.slug, 
             status: updatedSubcategory.status,
             category: updatedSubcategory.categoryId.name,
             updatedBy: updatedSubcategory.updatedBy.username

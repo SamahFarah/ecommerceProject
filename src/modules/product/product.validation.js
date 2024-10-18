@@ -6,6 +6,8 @@ export const createProductSchema = {
     name: Joi.string().required().messages({
       'string.empty': 'Product name is required',
     }),
+    slug: Joi.string().optional(),
+
     description: Joi.string().required().messages({
       'string.empty': 'Product description is required',
     }),

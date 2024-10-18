@@ -3,6 +3,7 @@ import { AppError } from "../../../AppError.js";
 import cloudinary from "../../Utils/cloudinary.js";
 import categoryModel from "../../../DB/models/category.model.js";
 import subcategoryModel from "../../../DB/models/Subcategory.model.js";
+import slugify from "slugify";
 
 export const createCategory = async (req, res, next) => {
     
@@ -12,6 +13,7 @@ export const createCategory = async (req, res, next) => {
         if (existingCategory) {
             return next(new AppError('Category name already exists', 400));
         }
+        req.body.slug = slugify(req.body.name, { lower: true });
         const {secure_url,public_id}=await cloudinary.uploader.upload(req.file.path,{folder:`${process.env.APPNAME}/category`});
         req.body.image=  {secure_url,public_id};
         req.body.createdBy=req.id;
@@ -78,7 +80,8 @@ export const getCategoryById = async (req, res, next) => {
             
             const updateFields = {};
             if (name) {
-                updateFields.name = name;
+                updateFields.name = name.toLowerCase();
+                updateFields.slug = slugify(name, { lower: true }); 
             }
             if (status) {
                 updateFields.status = status;
@@ -100,6 +103,7 @@ export const getCategoryById = async (req, res, next) => {
                 message: "success ",
                 category: {
                     name: updatedCategory.name,
+                    slug: updatedCategory.slug,
                     status: updatedCategory.status,
                     updatedBy: updatedCategory.updatedBy
                 }
