@@ -27,7 +27,7 @@ const productSchema = new Schema({
         required: true,
     },
     subImages: {
-        type: Object,
+        type: [Object],
         required: true,
     },
     price: {

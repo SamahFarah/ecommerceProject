@@ -1,8 +1,8 @@
 import Joi from 'joi';
 
 
-export const createProductSchema = {
-  body: Joi.object({
+export const createProductSchema = Joi.object({
+
     name: Joi.string().required().messages({
       'string.empty': 'Product name is required',
     }),
@@ -30,6 +30,28 @@ export const createProductSchema = {
       'string.length': 'Subcategory ID must be a valid 24-character ID',
       'any.required': 'Subcategory is required',
     }),
+    mainImage: Joi.object({
+      fieldname: Joi.string().required(),
+      originalname: Joi.string().required(),
+      encoding: Joi.string().required(),
+      mimetype: Joi.string().valid('image/png','image/jpeg','image/gif','image/JFIF').required(),
+      destination: Joi.string().required(),
+      filename: Joi.string().required(),
+      path: Joi.string().required(),
+      size: Joi.number().max(5000000).required() // الحجم الأقصى 5 ميجابايت
+    }).required(),
+    subImages: Joi.array().items(
+      Joi.object({
+        fieldname: Joi.string().required(),
+        originalname: Joi.string().required(),
+        encoding: Joi.string().required(),
+        mimetype: Joi.string().valid('image/png', 'image/jpeg', 'image/gif', 'image/JFIF').required(),
+        destination: Joi.string().required(),
+        filename: Joi.string().required(),
+        path: Joi.string().required(),
+        size: Joi.number().max(5000000).required() // الحجم الأقصى 5 ميجابايت
+      })
+    ).min(1).max(5).required(),
     colors: Joi.array().items(Joi.string()).optional().messages({
       'array.base': 'Colors must be an array of strings',
     }),
@@ -39,12 +61,12 @@ export const createProductSchema = {
     }),
     
     discount:Joi.number().positive().integer().optional(),
-  }),
-};
+  });
 
 
-export const getProductsSchema = {
-  params: Joi.object({
+
+export const getProductsSchema = Joi.object({
+
     categoryId: Joi.string().length(24).required().messages({
       'string.length': 'Category ID must be a valid 24-character ID',
       'any.required': 'Category ID is required',
@@ -53,25 +75,21 @@ export const getProductsSchema = {
       'string.length': 'Subcategory ID must be a valid 24-character ID',
       'any.required': 'Subcategory ID is required',
     }),
-  }),
-};
+  });
 
-export const getProductsByIdSchema = {
-  params: Joi.object({
+
+export const getProductsByIdSchema = Joi.object({
+
     productId: Joi.string().length(24).required().messages({
       'string.length': 'Category ID must be a valid 24-character ID',
       'any.required': 'Category ID is required',
     }),
-  })
-  
-};
+  });
 
-export const deletetProductSchema = {
-  params: Joi.object({
+export const deletetProductSchema = Joi.object({
+
     productId: Joi.string().length(24).required().messages({
       'string.length': 'Category ID must be a valid 24-character ID',
       'any.required': 'Category ID is required',
     }),
-  })
-  
-};
+  });

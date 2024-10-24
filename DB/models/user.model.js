@@ -16,8 +16,10 @@ password:{
     type:String,
     required:true,
 },
-image:{
-type:String,
+image: {
+    type: Object,
+    required: true,
+
 },
 phone:{
     type:String,

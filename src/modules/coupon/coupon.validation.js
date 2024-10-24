@@ -1,7 +1,6 @@
 import Joi from 'joi';
 
-export const createCouponSchema = {
-  body: Joi.object({
+export const createCouponSchema = Joi.object({
     name: Joi.string().required().messages({
       'string.empty': 'Coupon name is required',
     }),
@@ -13,5 +12,5 @@ export const createCouponSchema = {
       'date.base': 'Expire date must be a valid date',
       'date.greater': 'Expire date must be in the future',
     }),
-  }),
-};
+  });
+

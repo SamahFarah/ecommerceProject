@@ -5,11 +5,11 @@ import validation from "../../Middleware/validation.js";
 import { auth,roles } from "../../Middleware/auth.js";
 import { asyncHandler } from "../../Utils/catchError.js";
 import { endPoints } from "./coupon.role.js";
-import { createCouponSchema } from "./coupon.validation.js";
+import * as schema from './coupon.validation.js';
 
 
 
 
-router.post('/',auth(endPoints.create),validation(createCouponSchema),asyncHandler(couponController.createCoupon));
+router.post('/',validation(schema.createCouponSchema),auth(endPoints.create),asyncHandler(couponController.createCoupon));
 
 export default router;

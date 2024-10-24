@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
-export const createOrderSchema = {
-  body: Joi.object({
+export const createOrderSchema = Joi.object({
+
     couponName: Joi.string().optional().messages({
       'string.empty': 'Coupon name cannot be empty',
     }),
@@ -13,38 +13,37 @@ export const createOrderSchema = {
       'string.pattern.base': 'Phone number must start with 056 or 059 and be followed by 7 digits',
       'string.empty': 'Phone number cannot be empty',
     }),
-  }),
-};
+  });
 
 
-export const updateOrderStatusSchema = {
-  params: Joi.object({
+
+export const updateOrderStatusSchema = Joi.object({
+
     orderId: Joi.string().length(24).required().messages({
       'string.length': 'Order ID must be a valid 24-character (ObjectId)',
       'string.empty': 'Order ID is required',
     }),
-  }),
-  body: Joi.object({
+  
+
     newStatus: Joi.string().valid('pending', 'confirmed', 'cancelled').required().messages({
       'any.only': 'Status must be one of: pending, confirmed, cancelled',
       'string.empty': 'Status is required',
     }),
-  }),
-};
+  });
+  
 
-
-export const updateDeliveryStatusSchema = {
-  params: Joi.object({
+export const updateDeliveryStatusSchema = Joi.object({
+ 
     orderId: Joi.string().length(24).required().messages({
       'string.length': 'Order ID must be a valid 24-character (ObjectId)',
       'string.empty': 'Order ID is required',
     }),
-  }),
-  body: Joi.object({
+
+ 
     newStatus: Joi.string().valid('onWay', 'delivered', 'rejected').required().messages({
       'any.only': 'New status must be either onWay, delivered, or rejected',
       'string.empty': 'New status is required',
     }),
-  }),
-};
+  });
+
 

@@ -21,6 +21,13 @@ const validation = (schema) => {
     if(req.file){
       filterData.image=req.file;
     }
+    if (req.files.mainImage) {
+      filterData.mainImage = req.files.mainImage[0]; 
+    }
+    
+    if (req.files.subImages) {
+      filterData.subImages = req.files.subImages; 
+    }
     const {error}=schema.validate(filterData,{abortEarly:false});
     if(error){
       error.details.forEach( err=>{

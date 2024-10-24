@@ -24,8 +24,8 @@ export const Register = async (req, res, next) => {
      
     if (req.file) {
       try {
-        const { secure_url } = await cloudinary.uploader.upload(req.file.path);
-        image = secure_url;  
+        const {secure_url,public_id}=await cloudinary.uploader.upload(req.file.path,{folder:`${process.env.APPNAME}/users-photos`});
+        req.body.image=  {secure_url,public_id};
       } catch (error) {
         return next(new AppError('Image upload failed', 500));
       }

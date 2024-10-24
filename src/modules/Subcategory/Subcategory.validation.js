@@ -1,33 +1,43 @@
 import Joi from 'joi';
 
-export const createSubCategorySchema = {
-  body: Joi.object({
+export const createSubCategorySchema =  Joi.object({
+
     name: Joi.string().required().messages({
       'string.empty': 'Category name is required',
     }),
-    image: Joi.string(),
-    status: Joi.string().valid('active', 'not_active').default('not_active').messages({
+    image: Joi.object({
+      fieldname: Joi.string().required(),
+      originalname: Joi.string().required(),
+      encoding: Joi.string().required(),
+      mimetype: Joi.string().valid('image/png','image/jpeg','image/gif','image/JFIF').required(),
+      destination: Joi.string().required(),
+      filename: Joi.string().required(),
+      path: Joi.string().required(),
+      size: Joi.number().max(5000000).required() // الحجم الأقصى 5 ميجابايت
+    }).required(),
+        status: Joi.string().valid('active', 'not_active').default('not_active').messages({
       'any.only': 'Status must be either active or not_active',
     }),
     slug: Joi.string().optional(),
-    
-  }),
-  params: Joi.object({
     categoryId:Joi.string().length(24)
-  })
+
+    
+  });
+ 
+
 
   
-};
 
-export const getSubCategoryByIdSchema = {
-  params: Joi.object({
+
+export const getSubCategoryByIdSchema =   Joi.object({
+
       categoryId: Joi.string().length(24).required(), 
       subcategoryId: Joi.string().length(24).required() 
-  })
-};
+  });
 
-export const updateSubCategorySchema = {
-  params: Joi.object({
+
+export const updateSubCategorySchema = Joi.object({
+
       categoryId: Joi.string().length(24).required().messages({
           'string.length': 'Category ID must be a valid 24-character ObjectId',
           'string.empty': 'Category ID is required'
@@ -35,9 +45,9 @@ export const updateSubCategorySchema = {
       subcategoryId: Joi.string().length(24).required().messages({
           'string.length': 'Subcategory ID must be a valid 24-character ObjectId',
           'string.empty': 'Subcategory ID is required'
-      })
-  }),
-  body: Joi.object({
+      }),
+ 
+ 
       name: Joi.string().optional().messages({
           'string.empty': 'Subcategory name cannot be empty'
       }),
@@ -49,13 +59,11 @@ export const updateSubCategorySchema = {
           'string.length': 'New Category ID must be a valid 24-character ObjectId',
           'string.empty': 'New Category ID cannot be empty'
       }),
-  }),
-};
+    });
 
   
+export const updateSubCategoryImageSchema = Joi.object({
 
-export const updateSubCategoryImageSchema = {
-  params: Joi.object({
       categoryId: Joi.string().length(24).required().messages({
           'string.length': 'Category ID must be a valid 24-character ObjectId',
           'string.empty': 'Category ID is required'
@@ -63,13 +71,23 @@ export const updateSubCategoryImageSchema = {
       subcategoryId: Joi.string().length(24).required().messages({
           'string.length': 'Subcategory ID must be a valid 24-character ObjectId',
           'string.empty': 'Subcategory ID is required'
-      })
-  })
-};
+      }),
+      image: Joi.object({
+        fieldname: Joi.string().required(),
+        originalname: Joi.string().required(),
+        encoding: Joi.string().required(),
+        mimetype: Joi.string().valid('image/png','image/jpeg','image/gif','image/JFIF').required(),
+        destination: Joi.string().required(),
+        filename: Joi.string().required(),
+        path: Joi.string().required(),
+        size: Joi.number().max(5000000).required() // الحجم الأقصى 5 ميجابايت
+      }).required(),
+  });
 
 
-  export const deleteSubCategorySchema = {
-    params: Joi.object({
+
+  export const deleteSubCategorySchema =  Joi.object({
+
       categoryId: Joi.string().length(24).required().messages({
           'string.length': 'Category ID must be a valid 24-character ObjectId',
           'string.empty': 'Category ID is required'
@@ -77,6 +95,5 @@ export const updateSubCategoryImageSchema = {
       subcategoryId: Joi.string().length(24).required().messages({
           'string.length': 'Subcategory ID must be a valid 24-character ObjectId',
           'string.empty': 'Subcategory ID is required'
-      })
-  })
-};
+      }),
+  });
