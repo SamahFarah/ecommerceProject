@@ -19,25 +19,18 @@ const validation = (schema) => {
     const errorMessage = [];
     
     
-    let filterData = { ...req.body, ...req.params, ...req.query };
+    let filterData = {};
     if(req.file){
-      filterData.image=req.file;
+     filterData={image:req.file,...req.body, ...req.params, ...req.query}
     }
-    // التعامل مع رفع الصور من خلال fields
-    if (req.files) {
-      // إذا كانت mainImage موجودة
-      if (req.files.mainImage && req.files.mainImage.length > 0) {
-        filterData.mainImage = req.files.mainImage[0]; 
-      } else {
-      
-        return res.status(400).json({ message: "mainImage is required" });
-      }
-      
-      // التعامل مع subImages
-      if (req.files.subImages) {
-        filterData.subImages = req.files.subImages; 
-      }
+    else if(req.files){
+      filterData={...req.files,...req.body, ...req.params, ...req.query}
+
     }
+    else{
+      filterData = {...req.body, ...req.params, ...req.query};
+    }
+  
 
     
     const { error } = schema.validate(filterData, { abortEarly: false });

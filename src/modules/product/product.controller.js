@@ -96,9 +96,18 @@ export const getProducts = async (req, res, next) => {
     }
 
    
-    const products = await productModel.find({ subcategory: subcategoryId })
+    let products = await productModel.find({ subcategory: subcategoryId })
         .populate('reviews');
 
+        products=products.map(product=>{
+            return{
+                ...product.toObject(),
+                mainImage:product.mainImage.secure_url,
+                subImages:product.subImages.map(img=>img.secure_url)
+            }
+        })
+
+        
     
     return res.status(200).json({
         message: "success",
@@ -113,14 +122,18 @@ export const getProductById = async (req, res, next) => {
 
    
       
-        const product = await productModel.findById(productId);
+        let product = await productModel.findById(productId);
 
        
         if (!product) {
             return next(new AppError('Product not found', 404));
         }
 
-        
+        product = {
+            ...product.toObject(),
+            mainImage: product.mainImage.secure_url, // رابط secure_url للصورة الرئيسية
+            subImages: product.subImages.map(img => img.secure_url) // رابط secure_url للصور الثانوية
+        };
         return res.status(200).json({
             message: "success",
             product

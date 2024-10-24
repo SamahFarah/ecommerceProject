@@ -6,7 +6,6 @@ export const createProductSchema = Joi.object({
     name: Joi.string().required().messages({
       'string.empty': 'Product name is required',
     }),
-    slug: Joi.string().optional(),
 
     description: Joi.string().required().messages({
       'string.empty': 'Product description is required',
@@ -30,16 +29,18 @@ export const createProductSchema = Joi.object({
       'string.length': 'Subcategory ID must be a valid 24-character ID',
       'any.required': 'Subcategory is required',
     }),
-    mainImage: Joi.object({
-      fieldname: Joi.string().required(),
-      originalname: Joi.string().required(),
-      encoding: Joi.string().required(),
-      mimetype: Joi.string().valid('image/png','image/jpeg','image/gif','image/JFIF').required(),
-      destination: Joi.string().required(),
-      filename: Joi.string().required(),
-      path: Joi.string().required(),
-      size: Joi.number().max(5000000).required() // الحجم الأقصى 5 ميجابايت
-    }).required(),
+    mainImage: Joi.array().items({
+     
+        fieldname: Joi.string().required(),
+        originalname: Joi.string().required(),
+        encoding: Joi.string().required(),
+        mimetype: Joi.string().valid('image/png', 'image/jpeg', 'image/gif', 'image/JFIF').required(),
+        destination: Joi.string().required(),
+        filename: Joi.string().required(),
+        path: Joi.string().required(),
+        size: Joi.number().max(5000000).required() // الحجم الأقصى 5 ميجابايت
+      }).required(),
+    
     subImages: Joi.array().items(
       Joi.object({
         fieldname: Joi.string().required(),
@@ -51,7 +52,7 @@ export const createProductSchema = Joi.object({
         path: Joi.string().required(),
         size: Joi.number().max(5000000).required() // الحجم الأقصى 5 ميجابايت
       })
-    ).min(1).max(5).required(),
+    ).max(5).optional(),
     colors: Joi.array().items(Joi.string()).optional().messages({
       'array.base': 'Colors must be an array of strings',
     }),

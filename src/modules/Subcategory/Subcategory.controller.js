@@ -69,8 +69,13 @@ export const getSubcategories = async (req, res, next) => {
             }
         ]);
 
-   
-    return res.status(200).json({ message: "success", subcategories: populatedSubcategory });
+        const updatedSubcategories = populatedSubcategory.map(subcategory => {
+            return {
+                ...subcategory.toObject(),
+                image: subcategory.image?.secure_url // التأكد من وجود الصورة قبل الوصول إلى secure_url
+            };
+        });
+    return res.status(200).json({ message: "success", subcategories: updatedSubcategories });
 };
 
 
@@ -99,8 +104,11 @@ export const getSubcategoryById = async (req, res, next) => {
     if (!subcategory) {
         return next(new AppError('Subcategory not found or does not belong to the specified category', 404));
     }
-
-    return res.status(200).json({ message: "success", subcategory });
+    const updatedSubcategory = {
+        ...subcategory.toObject(),
+        image: subcategory.image?.secure_url // التأكد من وجود الصورة قبل الوصول إلى secure_url
+    };
+    return res.status(200).json({ message: "success", updatedSubcategory });
 };
 
 

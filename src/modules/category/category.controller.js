@@ -41,6 +41,12 @@ export const getCatergories = async (req,res,next)=>{
         }
     ]);
         
+    const updatedCategories = populatedCategory.map(category => {
+        return {
+            ...category.toObject(),
+            image: category.image?.secure_url // التأكد من وجود الصورة قبل الوصول إلى secure_url
+        };
+    });
 
 
     //another way:
@@ -48,7 +54,7 @@ export const getCatergories = async (req,res,next)=>{
     .populate('createdBy', 'username')
     .populate('updatedBy', 'username');*/
 
-    return res.status(200).json({message:"success",Categories:populatedCategory})
+    return res.status(200).json({message:"success",Categories:updatedCategories})
 
 };
 
@@ -64,13 +70,17 @@ export const getCategoryById = async (req, res, next) => {
             return next(new AppError('Category not found', 404));
         }
 
-        return res.status(200).json({message: "success",category})
+        const updatedCategory = {
+            ...category.toObject(),
+            image: category.image?.secure_url 
+        };
+        return res.status(200).json({message: "success",updatedCategory})
            
        
     } 
 
 
-    export const updateCategoryDetails = async (req, res, next) => {
+  export const updateCategoryDetails = async (req, res, next) => {
        
             const userId = req.id; 
             
@@ -111,7 +121,7 @@ export const getCategoryById = async (req, res, next) => {
     };
 
 
-    export const updateCategoryImage = async (req, res, next) => {
+ export const updateCategoryImage = async (req, res, next) => {
         const userId = req.id;
         const { id } = req.params;
     
