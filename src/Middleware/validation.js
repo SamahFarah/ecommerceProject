@@ -1,6 +1,5 @@
 import joi from 'joi';
 
-const dataMethods = ['body', 'query', 'params'];
 
 export const generalFeilds={
     email:joi.string().email().required().messages({
@@ -17,23 +16,22 @@ export const generalFeilds={
 
 const validation = (schema) => {
   return (req, res, next) => {
-    const validationArray = [];
-
-    dataMethods.forEach(key => {
-      if (schema[key]) {
-        const validationResult = schema[key].validate(req[key], { abortEarly: false });
-        if (validationResult.error) {
-          validationArray.push(validationResult.error.details);
-        }
-      }
-    });
-
-    if (validationArray.length > 0) {
-      return res.status(400).json({ message: "validation error", validationErrors: validationArray });
-    } else {
-      next();
+    const errorMessage=[];
+    let filterData= {...req.body,...req.params,...req.query};
+    if(req.file){
+      filterData.image=req.file;
     }
-  };
+    const {error}=schema.validate(filterData,{abortEarly:false});
+    if(error){
+      error.details.forEach( err=>{
+        const key= err.context.key;
+        errorMessage.push({[key]:err.message})
+      })
+      return res.status(400).json({message:"validation error",errors:errorMessage});
+    }
+    next();
+  
+}
 }
 
 export default validation;

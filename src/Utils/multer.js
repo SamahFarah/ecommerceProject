@@ -1,11 +1,15 @@
 import multer from 'multer';
 
-function fileUpload(){
+export const fileType= {
+   image: ['image/png','image/jpeg','image/gif','image/JFIF'],
+}
+
+function fileUpload(customTypes=[]){
     const storage = multer.diskStorage({});
        
 
     function fileFilter(req,file,cb){
-             if(['image/png','image/jpeg','image/gif','image/JFIF'].includes(file.mimetype)){
+             if(customTypes.includes(file.mimetype)){
                 cb(null,true)
              }
              else{

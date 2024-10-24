@@ -33,9 +33,11 @@ export const createProductSchema = {
     colors: Joi.array().items(Joi.string()).optional().messages({
       'array.base': 'Colors must be an array of strings',
     }),
-    sizes: Joi.array().items(Joi.string()).optional().messages({
+    sizes: Joi.array().items(Joi.string().valid('XS', 'S', 'M', 'L', 'XL', 'XXL')).optional().messages({
       'array.base': 'Sizes must be an array of strings',
+      'any.only': 'Sizes must be one of the following values: XS, S, M, L, XL, XXL',
     }),
+    
     discount:Joi.number().positive().integer().optional(),
   }),
 };
