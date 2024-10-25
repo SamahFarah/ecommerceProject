@@ -4,13 +4,14 @@ import couponModel from "../../../DB/models/coupon.model.js";
 import orderModel from "../../../DB/models/order.model.js";
 import productModel from "../../../DB/models/product.model.js";
 import userModel from "../../../DB/models/user.model.js";
+ import createInvoice from "../../Utils/pdf.js";
+
 
 export const createOrder= async (req, res, next) => {
    const {couponName}=req.body;
     const cart= await cartModel.findOne({userId:req.id});
-    if(!cart){
-        return next(new AppError(`cart is empty `, 409));
-
+    if (!cart || !cart.products.length) {
+      return next(new AppError(`cart is empty`, 409));
     }
     req.body.products= cart.products;
     if(couponName){
@@ -63,12 +64,26 @@ const order= await orderModel.create({
      finalPrice :subTotal - (subTotal * (req.body.coupon?.amount || 0) / 100),
     address: req.body.address,
 phone:req.body.phone,
-couponId:req.body.coupon._id,
+couponId:req.body.coupon ? req.body.coupon._id : null,
 notes:req.body.notes,
 updatedBy:req.id,
 });
 
 if(order){
+
+const invoice = {
+  shipping: {
+    name: user.username,
+    address: order.address,
+   phone: order.phone ,
+  },
+  items: order.products,
+  subtotal: order.finalPrice,
+  
+  invoice_nr: order._id,
+};
+
+createInvoice(invoice, "invoice.pdf");
     for(const product of req.body.products){
         await productModel.findOneAndUpdate({
             _id:product.productId
