@@ -5,7 +5,7 @@ import { AppError } from "../../../AppError.js";
 import cloudinary from "../../Utils/cloudinary.js";
 import { sendEmail } from "../../Utils/sendEmail.js";
 import { customAlphabet } from "nanoid";
-
+import xlsx from "xlsx";
 
 
 export const Register = async (req, res, next) => {
@@ -36,6 +36,52 @@ export const Register = async (req, res, next) => {
     const token= jwt.sign({email},process.env.CONFIRMEMAILTOKEN);
     await sendEmail(email,`confirm email from ecommerce website`,username,token)
     return res.status(201).json({ message: "success",creatUser});
+  };
+
+
+ export const addUserExcel = async (req, res, next) => {
+    try {
+      const workbook = xlsx.readFile(req.file.path);
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const users = xlsx.utils.sheet_to_json(worksheet);
+  
+      
+      for (let user of users) {
+        
+        const existingUser = await userModel.findOne({ email: user.email });
+        if (existingUser) continue; // تخطى المستخدم إذا كان البريد الإلكتروني موجود مسبقًا
+  
+        user.password = await bcrypt.hash(user.password, parseInt(process.env.SALTROUND));
+  
+        
+        if (user.image) {
+          try {
+            const { secure_url, public_id } = await cloudinary.uploader.upload(user.image, {
+              folder: `${process.env.APPNAME}/users-photos`,
+            });
+            user.image = { secure_url, public_id };
+          } catch (error) {
+            console.error(`Image upload failed for user: ${user.email}`);
+            user.image = ''; 
+          }
+        }
+
+        const createdUser = await userModel.create(user);
+  
+       
+        const token = jwt.sign({ email: user.email }, process.env.CONFIRMEMAILTOKEN);
+        await sendEmail(
+          user.email,
+          'confirm email from ecommerce website',
+          user.username,
+          token
+        );
+      }
+  
+      return res.status(200).json({ message: "success" });
+    } catch (error) {
+      next(new AppError('Failed to process the Excel file', 500));
+    }
   };
   
 export const confirmEmail = async (req,res)=>{

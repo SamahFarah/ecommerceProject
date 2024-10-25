@@ -18,7 +18,7 @@ password:{
 },
 image: {
     type: Object,
-    required: true,
+    
 
 },
 phone:{

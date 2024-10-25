@@ -1,5 +1,7 @@
 import Joi from 'joi';
 import { generalFeilds } from '../../Middleware/validation.js';
+
+
 export const registerSchema = Joi.object({
     username: Joi.string().min(3).max(10).required().messages({
         'string.empty':'username is required',
@@ -36,6 +38,9 @@ export const registerSchema = Joi.object({
     })
 
 });
+
+
+
 
 export const loginSchema =Joi.object({    
     email:generalFeilds.email,
